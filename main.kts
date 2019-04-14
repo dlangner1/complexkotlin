@@ -24,48 +24,59 @@ fun Int.times(block: () -> Unit): Unit {
 fun process(message: String, block: (String) -> String): String {
     return ">>> ${message}: {" + block(message) + "}"
 }
-val r1 = "" // call process() with message "FOO" and a block that returns "BAR"
 
+// call process() with message "FOO" and a block that returns "BAR"
+val r1 = process("FOO", { _: String -> "BAR" })
+
+// call process() with message "FOO" and a block that upper-cases
+// r2_message, and repeats it three times with no spaces: "WOOGAWOOGAWOOGA"
 val r2_message = "wooga"
-val r2 = "" // call process() with message "FOO" and a block that upper-cases 
-            // r2_message, and repeats it three times with no spaces: "WOOGAWOOGAWOOGA"
-
+val r2 = process("FOO", { _: String -> (r2_message + r2_message + r2_message).toUpperCase() })
 
 // write an enum-based state machine between talking and thinking
-enum class Philosopher { }
+enum class Philosopher {
+    THINKING {
+        override fun signal() = TALKING
+        override fun toString() = "Deep thoughts...."
+    },
+    TALKING {
+        override fun signal() = THINKING
+        override fun toString() = "Allow me to suggest an idea..."
+    };
+    abstract fun signal(): Philosopher
+}
 
 // create an class "Command" that can be used as a function (provide an "invoke()" function)
 // that takes a single parameter ("message" of type String)
 // primary constructor should take a String argument ("prompt")
 // when called, the Command object should return a String containing the prompt and then the message
 class Command(val prompt: String) {
+    operator fun invoke(message: String) = prompt + message
 }
-
-
 
 
 // ================================
 println("map fold test: " + if (mapFoldResults == "FIZZBUZZFIZZFIZZBUZZFIZZFIZZBUZZ") "." else "!")
 
-//println("r1 test: " + if (r1 == ">>> FOO: {BAR}") "." else "!")
-//
-//println("r2 test: " + if (r2 == ">>> FOO: {WOOGAWOOGAWOOGA}") "." else "!")
-//
-//var seneca = Philosopher.THINKING
-//print("Seneca, talk! ")
-//seneca = seneca.signal()
-//println(if (seneca.toString() == "Allow me to suggest an idea...") "." else "!")
-//print("Seneca, think! ")
-//seneca = seneca.signal()
-//println(if (seneca.toString() == "Deep thoughts....") "." else "!")
-//print("Seneca, talk! ")
-//seneca = seneca.signal()
-//println(if (seneca.toString() == "Allow me to suggest an idea...") "." else "!")
-//
-//print("Command tests: ")
-//print(if (Command("")("") == "") "." else "!")
-//print(if (Command("> ")("Hello!") == "> Hello!") "." else "!")
-//println("")
+println("r1 test: " + if (r1 == ">>> FOO: {BAR}") "." else "!")
+
+println("r2 test: " + if (r2 == ">>> FOO: {WOOGAWOOGAWOOGA}") "." else "!")
+
+var seneca = Philosopher.THINKING
+print("Seneca, talk! ")
+seneca = seneca.signal()
+println(if (seneca.toString() == "Allow me to suggest an idea...") "." else "!")
+print("Seneca, think! ")
+seneca = seneca.signal()
+println(if (seneca.toString() == "Deep thoughts....") "." else "!")
+print("Seneca, talk! ")
+seneca = seneca.signal()
+println(if (seneca.toString() == "Allow me to suggest an idea...") "." else "!")
+
+print("Command tests: ")
+print(if (Command("")("") == "") "." else "!")
+print(if (Command("> ")("Hello!") == "> Hello!") "." else "!")
+println("")
 
 
 
